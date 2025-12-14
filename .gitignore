@@ -1,5 +1,7 @@
 venv/*
 
+screens/*
+
 announcement.json
 
 data.json

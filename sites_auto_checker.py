@@ -94,9 +94,23 @@ for i, value in enumerate(values, start=1):
     time.sleep(5)
 
     # Проверка на блокировку ресурса
+    wait = WebDriverWait(driver, 20)
     page_source = driver.page_source.lower()
+    print("page_source = ", page_source)
+
     if blocked_text.lower() in page_source:
-        print(f"⛔ Найдено: '{blocked_text}' → пауза {pause_seconds} сек.")
+        try:
+            # Найти элемент с текстом блокировки
+            element = driver.find_element(By.XPATH, f"//*[contains(translate(., 'ОРГАНПРИНЯВШИЙРЕШЕНИЕОВНЕСЕНИИ', 'органпринявшийрешениеовнесении'), '{blocked_text.lower()}')]")
+            screenshot_path = f"screens/blocked_{i}_{int(time.time())}.png"
+            element.screenshot(screenshot_path)
+            print(f"📸 Сохранён фрагмент страницы: {screenshot_path}")
+        except Exception as e:
+            print(f"⚠ Не удалось сделать скриншот блока: {e}")
+            fallback_path = f"blocked_full_{i}_{int(time.time())}.png"
+            driver.save_screenshot(fallback_path)
+
+            print(f"📸 Сохранён полный скриншот: {fallback_path}")
         time.sleep(pause_seconds)
     else:
         print("✅ Ресурс не заблокирован")
